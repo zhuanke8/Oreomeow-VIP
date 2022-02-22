@@ -59,7 +59,7 @@ dl_extra_shell() {
     if [ ! -a "$extra_shell_path" ]; then
         touch $extra_shell_path
     fi
-    curl -s --connect-timeout 3 https://raw.githubusercontent.com/Oreomeow/VIP/main/Tasks/qlrepo/extra.sh > $extra_shell_path
+    curl -s --connect-timeout 3 https://raw.githubusercontent.com/zhuanke8/Oreomeow-VIP/main/Tasks/qlrepo/extra.sh > $extra_shell_path
     cp $extra_shell_path $dir_config/extra.sh
     # 判断是否下载成功
     extra_size=$(ls -l $extra_shell_path | awk '{print $5}')
@@ -72,12 +72,12 @@ dl_extra_shell() {
 }
 # extra.sh 预设仓库及默认拉取仓库设置
 set_default_extra() {   
-    echo -e "一、集成仓库（Collected Repositories)\n2-JDHelloWorld\n3-he1pu\n4-shufflewzc\n6-Aaron-lv\n7-yuannian1112"
-    read -p "输入您想拉取集成仓库编号(回车默认为 4)，拉取多个请用空格隔开:" CollectedRepo
-    echo -e "二、其他仓库（Other Repositories）\n1-passerby-b\n2-curtinlv\n3-smiek2221\n4-cdle\n5-ZCY01\n6-whyour/hundun\n7-moposmall\n8-Ariszy (Zhiyi-N)\n9-photonmang\n10-jiulan\n12-star261\n13-Wenmoux\n14-Tsukasa007"
+    echo -e "一、集成仓库（Collected Repositories)\n2-JDHelloWorld\n3-he1pu\n6-Aaron-lv\n9-zero205\n10-okyyds\n11-KingRan\n12-gys619\n13-jia_yuan"
+    read -p "输入您想拉取集成仓库编号(回车默认为 13)，拉取多个请用空格隔开:" CollectedRepo
+    echo -e "二、其他仓库（Other Repositories）\n1-passerby-b\n2-curtinlv\n3-smiek2221\n4-cdle\n5-jiulan\n6-star261\n7-Tsukasa007\n8-mmnvnmm\n9-X1a0He\n10-chianPLA\n11-yzaw\n12-Zy143L/wskey\n13-Mashiro2000/HeyTapTask\n0-ccwav"
     read -p "输入您想拉取其他仓库编号(回车默认不拉取)，拉取多个请用空格隔开:" OtherRepo 
-    CollectedRepo=${CollectedRepo:-"4"}
-    sed -i "s/CollectedRepo=(4)/CollectedRepo=(${CollectedRepo})/g" $extra_shell_path
+    CollectedRepo=${CollectedRepo:-"13"}
+    sed -i "s/CollectedRepo=(13)/CollectedRepo=(${CollectedRepo})/g" $extra_shell_path
     sed -i "s/OtherRepo=()/OtherRepo=(${OtherRepo})/g" $extra_shell_path
     echo -e "Ninja\n###（1）默认启动并自动更新\n###（2）！！！未修改容器映射的请勿运行，否则会出现青龙打不开或者设备死机等不良后果，映射参考 https://github.com/MoonBegonia/ninja#%E5%AE%B9%E5%99%A8%E5%86%85"
     read -p "Ninja="on" ##up为更新，on为启动，down为不运行，请输入您的设置（默认运行） up/on/down：" Ninja
@@ -124,7 +124,7 @@ dl_code_shell() {
     if [ ! -a "$code_shell_path" ]; then
         touch $code_shell_path
     fi
-    curl -s --connect-timeout 3 https://raw.githubusercontent.com/Oreomeow/VIP/main/Scripts/sh/Helpcode2.8/code.sh > $code_shell_path
+    curl -s --connect-timeout 3 https://raw.githubusercontent.com/zhuanke8/Oreomeow-VIP/main/Scripts/sh/Helpcode2.8/code.sh > $code_shell_path
     cp $code_shell_path $dir_config/code.sh
     # 判断是否下载成功
     code_size=$(ls -l $code_shell_path | awk '{print $5}')
@@ -137,10 +137,10 @@ dl_code_shell() {
 }
 # code.sh 预设仓库及默认调用仓库设置
 set_default_code() {
-    echo -e "## 将\"repo=\$repo1\"改成\"repo=\$repo2\"或其他，以默认调用其他仓库脚本日志\nrepo1='panghu999_jd_scripts' #预设的 panghu999 仓库\nrepo2='JDHelloWorld_jd_scripts' #预设的 JDHelloWorld 仓库\nrepo3='he1pu_JDHelp' #预设的 he1pu 仓库\nrepo4='shufflewzc_faker2' #预设的 shufflewzc 仓库\nrepo6='Aaron-lv_sync_jd_scripts' #预设的 Aaron-lv 仓库\nrepoA='yuannian1112_jd_scripts' #预设的 yuannian1112 仓库\nrepo=\$repo1 #默认调用 panghu999 仓库脚本日志"
-    read -p "输入您想调用的仓库编号(默认为 4):" repoNum
-    repoNum=${repoNum:-'4'}
-    sed -i "s/repo=\$repo[0-9]/repo=\$repo${repoNum}/g" $code_shell_path
+    echo -e "## 将\"repo=\$repo1\"改成\"repo=\$repo2\"或其他，以默认调用其他仓库脚本日志\nrepo2='JDHelloWorld_jd_scripts' #预设的 JDHelloWorld 仓库\nrepo3='he1pu_JDHelp' #预设的 he1pu 仓库\nrepo6='Aaron-lv_sync_jd_scripts' #预设的 Aaron-lv 仓库\nrepo9='zero205_JD_tencent_scf_main' #预设的 zero205 仓库\nrepo10='okyyds_yyds_master' #预设的 okyyds 仓库\nrepo11='KingRan_KR' #预设的 KingRan 仓库\nrepo12='gys619_jdd' #预设的 gys619 仓库\nrepo13='jia_yuan_xdd-script' #预设的 jia_yuan 仓库\nrepo=\$repo13 #默认调用 jia_yuan 仓库脚本日志"
+    read -p "输入您想调用的仓库编号(默认为 13):" repoNum
+    repoNum=${repoNum:-'13'}
+    sed -i "s/repo=\$repo[0-13]/repo=\$repo${repoNum}/g" $code_shell_path
     if [ "${repoNum}" = 'A' ]; then
         sed -i "/^repo7=/a\repoA='yuannian1112_jd_scripts'" $code_shell_path
     fi
