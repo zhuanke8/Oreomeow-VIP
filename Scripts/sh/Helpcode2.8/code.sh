@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 
-## Build 20210827-001
+## Build 20210906-001
 
 ## 导入通用变量与函数
 dir_shell=/ql/shell
 . $dir_shell/share.sh
-
-dir_env_db=/$dir_db/env.db
-
-## 删除失效Cookie开关，默认是0，表示关闭；设置为1，表示开启
-DEL_COOKIE="0"
 
 ## 预设的仓库及默认调用仓库设置
 ## 将"repo=$repo1"改成repo=$repo2"或其他，以默认调用其他仓库脚本日志
@@ -84,7 +79,7 @@ UpdateType="1"
 ## 定义是否自动安装或修复缺失的依赖，默认为1，表示自动修复；留空或其他数值表示不修复。
 FixDependType="1"
 ## 定义监控修复的依赖名称
-package_name="canvas png-js date-fns axios crypto-js ts-md5 tslib @types/node dotenv typescript fs require tslib"
+package_name="@types/node axios canvas crypto-js date-fns dotenv fs jsdom png-js require ts-md5 tslib typescript"
 
 ## 需组合的环境变量列表，env_name需要和var_name一一对应，如何有新活动按照格式添加(不懂勿动)
 env_name=(
@@ -194,6 +189,7 @@ gen_pt_pin_array() {
   local tmp1 tmp2 i pt_pin_temp
   for i in "${!array[@]}"; do
     pt_pin_temp=$(echo ${array[i]} | perl -pe "{s|.*pt_pin=([^; ]+)(?=;?).*|\1|; s|%|\\\x|g}")
+    remark_name[i]=$(cat $dir_db/env.db | grep ${array[i]} | perl -pe "{s|.*remarks\":\"([^\"]+).*|\1|g}" | tail -1)
     [[ $pt_pin_temp == *\\x* ]] && pt_pin[i]=$(printf $pt_pin_temp) || pt_pin[i]=$pt_pin_temp
   done
 }
@@ -574,17 +570,13 @@ esac
 }
 
 check_jd_cookie(){
-[[ "$(curl -s --noproxy "*" "https://bean.m.jd.com/bean/signIndex.action" -H "cookie: $1")" ]] && echo "COOKIE 有效" || echo "COOKIE 已失效"
-}
-
-delete_old_cookie(){
-local ifold=$(curl -s --noproxy "*" "https://bean.m.jd.com/bean/signIndex.action" -H "cookie: $1")
-if [ ! "$ifold" ]; then
-  sed -i "s/$1/d" $dir_env_db
-  echo "COOKIE 失效，将被删除"
-else
-  echo "COOKIE 有效"
-fi
+    local test_connect="$(curl -I -s --connect-timeout 5 https://bean.m.jd.com/bean/signIndex.action -w %{http_code} | tail -n1)"
+    local test_jd_cookie="$(curl -s --noproxy "*" "https://bean.m.jd.com/bean/signIndex.action" -H "cookie: $1")"
+    if [ "$test_connect" -eq "302" ]; then
+        [[ "$test_jd_cookie" ]] && echo "(COOKIE 有效)" || echo "(COOKIE 已失效)"
+    else
+        echo "(API 连接失败)"
+    fi
 }
 
 dump_user_info(){
@@ -593,11 +585,7 @@ local envs=$(eval echo "\$JD_COOKIE")
 local array=($(echo $envs | sed 's/&/ /g'))
     for ((m = 0; m < ${#pt_pin[*]}; m++)); do
         j=$((m + 1))
-        if [[ $DEL_COOKIE = "1" ]]; then
-          echo -e "## 用户名 $j：${pt_pin[m]} (`delete_old_cookie ${array[m]}`)\nCookie$j=\"${array[m]}\""
-        else
-          echo -e "## 用户名 $j：${pt_pin[m]} (`check_jd_cookie ${array[m]}`)\nCookie$j=\"${array[m]}\""
-        fi
+        echo -e "## 用户名 $j：${pt_pin[m]} 备注：${remark_name[m]} `check_jd_cookie ${array[m]}`\nCookie$j=\"${array[m]}\""
     done
 }
 
@@ -687,7 +675,7 @@ install_dependencies_force(){
 install_dependencies_all(){
     install_dependencies_normal $package_name
     for i in $package_name; do
-        install_dependencies_force $i
+        {install_dependencies_force $i} &
     done
 }
 
@@ -707,6 +695,3 @@ update_help
 
 ## 修改curtinlv入会领豆配置文件的参数
 [[ -f /ql/repo/curtinlv_JD-Script/OpenCard/OpenCardConfig.ini ]] && sed -i "4c JD_COOKIE = '$(echo $JD_COOKIE | sed "s/&/ /g; s/\S*\(pt_key=\S\+;\)\S*\(pt_pin=\S\+;\)\S*/\1\2/g;" | perl -pe "s| |&|g")'" /ql/repo/curtinlv_JD-Script/OpenCard/OpenCardConfig.ini
-
-echo "All Done"
-exit
